@@ -1,0 +1,31 @@
+# LaTeX build artifacts
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.lof
+*.log
+*.lot
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+*.xdv
+
+# Main generated PDF; keep logo PDFs under img/.
+/myThesis.pdf
+
+# Temporary and editor files
+*.bak
+*.tmp
+*.swp
+*.synctex
+~$*
+.DS_Store
+Thumbs.db
+
+# Local reference materials used while building the template.
+# Do not commit these Word/PDF references to a public template repo.
+/template reference/
