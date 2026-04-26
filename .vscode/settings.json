@@ -1,0 +1,42 @@
+{
+  "latex-workshop.latex.autoBuild.run": "onFileChange",
+  "latex-workshop.latex.autoClean.run": "onBuilt",
+  "latex-workshop.latex.clean.method": "glob",
+  "latex-workshop.latex.clean.subfolder.enabled": false,
+  "latex-workshop.latex.clean.fileTypes": [
+    "*.aux",
+    "*.bbl",
+    "*.blg",
+    "*.fdb_latexmk",
+    "*.fls",
+    "*.lof",
+    "*.log",
+    "*.lot",
+    "*.out",
+    "*.toc",
+    "*.xdv"
+  ],
+  "latex-workshop.latex.recipe.default": "first",
+  "latex-workshop.latex.build.enableMagicComments": true,
+  "latex-workshop.latex.tools": [
+    {
+      "name": "latexmk-xelatex-bibtex",
+      "command": "latexmk",
+      "args": [
+        "-xelatex",
+        "-interaction=nonstopmode",
+        "-file-line-error",
+        "-synctex=1",
+        "%DOC%"
+      ]
+    }
+  ],
+  "latex-workshop.latex.recipes": [
+    {
+      "name": "latexmk-xelatex-bibtex",
+      "tools": [
+        "latexmk-xelatex-bibtex"
+      ]
+    }
+  ]
+}
