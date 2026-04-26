@@ -1,6 +1,7 @@
 {
   "latex-workshop.latex.autoBuild.run": "onFileChange",
-  "latex-workshop.latex.autoClean.run": "onBuilt",
+  "latex-workshop.latex.autoClean.run": "never",
+  "latex-workshop.latex.outDir": "%DIR%/build",
   "latex-workshop.latex.clean.method": "glob",
   "latex-workshop.latex.clean.subfolder.enabled": false,
   "latex-workshop.latex.clean.fileTypes": [
@@ -27,6 +28,7 @@
         "-interaction=nonstopmode",
         "-file-line-error",
         "-synctex=1",
+        "-outdir=build",
         "%DOC%"
       ]
     }

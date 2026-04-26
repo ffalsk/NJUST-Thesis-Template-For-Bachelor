@@ -6,25 +6,26 @@
 
 ## 快速开始
 
-使用 XeLaTeX 编译：
+使用 XeLaTeX 编译。根目录的 `.latexmkrc` 已经指定了 XeLaTeX 和 `build/` 输出目录：
 
 ```powershell
-latexmk -xelatex -interaction=nonstopmode -file-line-error myThesis.tex
+latexmk myThesis.tex
 ```
 
-目录、图表目录、交叉引用和参考文献都需要多轮编译，`latexmk` 会自动完成。
+目录、图表目录、交叉引用和参考文献都需要多轮编译，`latexmk` 会自动完成。中间文件会统一放在 `build/` 目录；`build/myThesis.pdf` 是 LaTeX Workshop 用来正反向定位的 PDF，构建成功后会额外复制一份 `myThesis.pdf` 到根目录，方便直接查看或提交。
 
 VS Code 已配置 LaTeX Workshop：
 
 - 保存文件后自动编译：`.vscode/settings.json` 中的 `latex-workshop.latex.autoBuild.run`。
-- 构建完成后自动清理中间文件：`latex-workshop.latex.autoClean.run`。
-- 自动清理会删除 `.aux`、`.bbl`、`.blg`、`.toc`、`.lof`、`.lot`、`.log`、`.fls`、`.fdb_latexmk`、`.xdv` 等文件，但保留源文件。
+- 不再自动清理中间文件：`latex-workshop.latex.autoClean.run` 设为 `never`，这样下次增量编译会快很多。
+- PDF 正反向定位使用 `build/myThesis.pdf` 和 `build/myThesis.synctex.gz`。根目录的 `myThesis.pdf` 只是构建成功后复制出来的成品副本。
 
-手动清理：
+如果确实需要完全重新构建，可以手动清理：
 
 ```powershell
-latexmk -c myThesis.tex
-Remove-Item myThesis.bbl,myThesis.synctex.gz -ErrorAction SilentlyContinue
+latexmk -C myThesis.tex
+Remove-Item build -Recurse -Force -ErrorAction SilentlyContinue
+Remove-Item myThesis.pdf -Force -ErrorAction SilentlyContinue
 ```
 
 ## 从 Word 切换到 LaTeX
@@ -313,13 +314,14 @@ Write the English abstract here.
 
 ## GitHub 提交说明
 
-已添加 `.gitignore`，默认忽略 LaTeX 中间文件、`myThesis.pdf` 和本地 `template reference/` 目录。`img/logo/njust.pdf` 不会被忽略，因为它是模板需要的 logo 文件。
+已添加 `.gitignore`，默认忽略 `build/`、根目录成品 `myThesis.pdf` 和本地 `template reference/` 目录。`img/logo/njust.pdf` 不会被忽略，因为它是模板需要的 logo 文件。
 
 建议提交这些内容：
 
 - `myThesis.tex`
 - `README.md`
 - `.gitignore`
+- `.latexmkrc`
 - `.vscode/settings.json`
 - `sty/`
 - `tex/`
