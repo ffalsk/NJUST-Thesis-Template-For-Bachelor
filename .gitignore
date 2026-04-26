@@ -3,6 +3,7 @@
 *.bbl
 *.bcf
 *.blg
+*.bkm
 *.fdb_latexmk
 *.fls
 *.lof
@@ -10,7 +11,7 @@
 *.lot
 *.out
 *.run.xml
-*.synctex.gz
+*.synctex*
 *.toc
 *.xdv
 
@@ -21,7 +22,6 @@
 *.bak
 *.tmp
 *.swp
-*.synctex
 ~$*
 .DS_Store
 Thumbs.db

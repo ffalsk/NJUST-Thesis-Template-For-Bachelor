@@ -20,7 +20,7 @@
 \DeclareOption*{\PassOptionsToClass{\CurrentOption}{ctexbook}}
 \ProcessOptions\relax
 
-\LoadClass[UTF8,a4paper,zihao=-4,openany,twoside,fontset=windows]{ctexbook}
+\LoadClass[UTF8,a4paper,zihao=-4,openany,twoside,fontset=none]{ctexbook}
 
 % 只保留模板自身需要的包。正文若需要算法、代码、高级表格等扩展，
 % 建议在 myThesis.tex 中额外加载，避免 class 变重。
@@ -37,6 +37,7 @@
 \RequirePackage{etoolbox}
 \RequirePackage[square,comma,numbers,sort&compress,super]{natbib}
 \RequirePackage[hidelinks,hypertexnames=false]{hyperref}
+\RequirePackage{bookmark}
 
 \usetikzlibrary{calc}
 
@@ -64,44 +65,101 @@
 % Fonts And Body Text
 % ----------------------------------------------------------------------
 % 要求：汉字用宋体，数字和字母用 Times New Roman。
-% XeLaTeX 会自动按字符选择 CJK/西文字体；正文里不用手动加字体命令。
+%
+% Overleaf 分支说明：
+%   Overleaf/Linux 通常没有 Windows 的 SimSun/SimHei/KaiTi 字体。
+%   如果 class 直接用 ctexbook 的 fontset=windows，Overleaf 会在加载 class 时
+%   报 “The font SimSun cannot be found”。所以本分支使用 fontset=none，
+%   然后在这里手动做字体回退：
+%     - 本地 Windows 有 SimSun 时：继续使用 SimSun/SimHei/KaiTi，接近 Word。
+%     - Overleaf 没有 Windows 字体时：使用 TeX Live 自带 Fandol 字体，保证可编译。
+%     - 西文优先 Times New Roman；没有时使用 TeX Gyre Termes 作为 Times-like 回退。
+%
+% 如果要严格提交宋体最终版，建议本地 Windows 编译；不要把 Windows 字体文件提交到
+% 公开仓库，通常有授权限制。
 \defaultfontfeatures{Ligatures=TeX}
-\IfFontExistsTF{Times New Roman}{\setmainfont{Times New Roman}}{}
-\IfFontExistsTF{Arial}{\setsansfont{Arial}}{}
-\IfFontExistsTF{Consolas}{\setmonofont{Consolas}}{}
-% 中文宋体/黑体/楷体由 ctexbook 的 fontset=windows 提供：
-%   \songti, \heiti, \kaishu
-% 如果要换成其它中文字体，优先改 \LoadClass 的 fontset，
-% 或在这里重新启用 \setCJKmainfont / \setCJKfamilyfont。
+\IfFontExistsTF{Times New Roman}{%
+  \setmainfont{Times New Roman}%
+}{%
+  \IfFontExistsTF{TeX Gyre Termes}{\setmainfont{TeX Gyre Termes}}{}%
+}
+\IfFontExistsTF{Arial}{%
+  \setsansfont{Arial}%
+}{%
+  \IfFontExistsTF{TeX Gyre Heros}{\setsansfont{TeX Gyre Heros}}{}%
+}
+\IfFontExistsTF{Consolas}{%
+  \setmonofont{Consolas}%
+}{%
+  \IfFontExistsTF{Inconsolata}{\setmonofont{Inconsolata}}{}%
+}
 
 % 中文粗体粗细统一控制。
-% ctex 的 Windows 字体集里，部分中文粗体可能会走较重的字体或默认伪粗；
-% 这里显式把宋体、黑体、楷体的 \bfseries 绑定到可调 FakeBold。
 % 数值越大越粗；如果比 Word 粗，先试 1.1--1.3；如果太细，试 1.5--1.8。
 \newcommand{\NJUST@CJKBoldFake}{3.0}
 \IfFontExistsTF{SimSun}{%
+  % Windows / 本地 Word 风格字体。
   \setCJKmainfont{SimSun}[
     BoldFont = SimSun,
-    BoldFeatures = { FakeBold = \NJUST@CJKBoldFake },
-    ItalicFont = KaiTi
+    BoldFeatures = { FakeBold = \NJUST@CJKBoldFake }
   ]%
   \setCJKfamilyfont{zhsong}{SimSun}[
     BoldFont = SimSun,
     BoldFeatures = { FakeBold = \NJUST@CJKBoldFake }
   ]%
-}{}
-\IfFontExistsTF{SimHei}{%
-  \setCJKfamilyfont{zhhei}{SimHei}[
-    BoldFont = SimHei,
-    BoldFeatures = { FakeBold = \NJUST@CJKBoldFake }
-  ]%
-}{}
-\IfFontExistsTF{KaiTi}{%
-  \setCJKfamilyfont{zhkai}{KaiTi}[
-    BoldFont = KaiTi,
-    BoldFeatures = { FakeBold = \NJUST@CJKBoldFake }
-  ]%
-}{}
+  \IfFontExistsTF{SimHei}{%
+    \setCJKfamilyfont{zhhei}{SimHei}[
+      BoldFont = SimHei,
+      BoldFeatures = { FakeBold = \NJUST@CJKBoldFake }
+    ]%
+  }{%
+    \setCJKfamilyfont{zhhei}{SimSun}[
+      BoldFont = SimSun,
+      BoldFeatures = { FakeBold = \NJUST@CJKBoldFake }
+    ]%
+  }%
+  \IfFontExistsTF{KaiTi}{%
+    \setCJKfamilyfont{zhkai}{KaiTi}[
+      BoldFont = KaiTi,
+      BoldFeatures = { FakeBold = \NJUST@CJKBoldFake }
+    ]%
+  }{%
+    \setCJKfamilyfont{zhkai}{SimSun}[
+      BoldFont = SimSun,
+      BoldFeatures = { FakeBold = \NJUST@CJKBoldFake }
+    ]%
+  }%
+}{%
+  % Overleaf / TeX Live 默认可用字体。Fandol 字体在字形上不等于 Word 宋体，
+  % 但无需上传商业字体即可稳定编译。
+  \IfFontExistsTF{FandolSong-Regular.otf}{%
+    \setCJKmainfont{FandolSong-Regular.otf}[
+      BoldFont = FandolSong-Bold.otf,
+      ItalicFont = FandolKai-Regular.otf
+    ]%
+    \setCJKfamilyfont{zhsong}{FandolSong-Regular.otf}[
+      BoldFont = FandolSong-Bold.otf
+    ]%
+    \setCJKfamilyfont{zhhei}{FandolHei-Regular.otf}[
+      BoldFont = FandolHei-Regular.otf,
+      BoldFeatures = { FakeBold = \NJUST@CJKBoldFake }
+    ]%
+    \setCJKfamilyfont{zhkai}{FandolKai-Regular.otf}[
+      BoldFont = FandolKai-Regular.otf,
+      BoldFeatures = { FakeBold = \NJUST@CJKBoldFake }
+    ]%
+  }{%
+    \PackageWarningNoLine{njustBachelorThesis}{%
+      No Windows CJK fonts or Fandol fonts found. Please use XeLaTeX and install CJK fonts%
+    }%
+  }%
+}
+
+% 使用 fontset=none 后，ctex 不再自动声明 \songti/\heiti/\kaishu。
+% 模板下面统一用这些语义化字体命令，因此这里手动绑定到上面配置好的 CJK family。
+\providecommand{\songti}{\CJKfamily{zhsong}}
+\providecommand{\heiti}{\CJKfamily{zhhei}}
+\providecommand{\kaishu}{\CJKfamily{zhkai}}
 
 % 正文：小四号宋体，固定 20 磅行距，首行缩进 2 字符。
 % 如果正文整体显得太松/太紧，只改 \NJUST@bodyfont 里的 baselineskip。

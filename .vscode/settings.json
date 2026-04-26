@@ -4,16 +4,9 @@
   "latex-workshop.latex.clean.method": "glob",
   "latex-workshop.latex.clean.subfolder.enabled": false,
   "latex-workshop.latex.clean.fileTypes": [
-    "*.aux",
-    "*.bbl",
     "*.blg",
-    "*.fdb_latexmk",
-    "*.fls",
-    "*.lof",
     "*.log",
-    "*.lot",
-    "*.out",
-    "*.toc",
+    "*.synctex.gz",
     "*.xdv"
   ],
   "latex-workshop.latex.recipe.default": "first",

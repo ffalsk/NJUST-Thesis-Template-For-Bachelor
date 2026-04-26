@@ -18,7 +18,7 @@ VS Code 已配置 LaTeX Workshop：
 
 - 保存文件后自动编译：`.vscode/settings.json` 中的 `latex-workshop.latex.autoBuild.run`。
 - 构建完成后自动清理中间文件：`latex-workshop.latex.autoClean.run`。
-- 自动清理会删除 `.aux`、`.bbl`、`.blg`、`.toc`、`.lof`、`.lot`、`.log`、`.fls`、`.fdb_latexmk`、`.xdv` 等文件，但保留源文件。
+- 自动清理只删除 `.log`、`.synctex.gz`、`.xdv` 这类纯临时文件；`.aux`、`.bbl`、`.toc`、`.lof`、`.lot`、`.out` 会保留在本地作为交叉引用缓存。它们已被 `.gitignore` 忽略，不需要提交。
 
 手动清理：
 
@@ -26,6 +26,23 @@ VS Code 已配置 LaTeX Workshop：
 latexmk -c myThesis.tex
 Remove-Item myThesis.bbl,myThesis.synctex.gz -ErrorAction SilentlyContinue
 ```
+
+## Overleaf 使用
+
+这是 `overleaf` 分支，已经针对 Overleaf 做了字体兼容处理。上传到 Overleaf 后，编译器请选择 **XeLaTeX**；根目录的 `.latexmkrc` 也会让 Overleaf/latexmk 默认走 XeLaTeX。
+
+Overleaf 默认没有 Windows 的 `SimSun`、`SimHei`、`KaiTi` 字体，所以不能像本地 Windows 一样直接依赖 `fontset=windows`。本分支在 `sty/njustBachelorThesis.cls` 中使用 `fontset=none` 并手动设置字体：
+
+- 本地 Windows：如果能找到 `SimSun / SimHei / KaiTi`，仍优先使用它们，效果更接近 Word 模板。
+- Overleaf/Linux：找不到 Windows 字体时，自动回退到 TeX Live 自带的 `Fandol` 中文字体，保证能直接编译。
+- 西文字体：优先使用 `Times New Roman`，找不到时回退到 `TeX Gyre Termes`。
+
+注意：Fandol 字体不是 Windows 宋体，字形不可能 100% 等同 Word。如果最终提交必须严格使用宋体，建议在本地 Windows 编译最终版。不要把 Windows 系统字体提交到公开 GitHub 仓库，这些字体通常有授权限制。
+
+如果 Overleaf 免费版提示编译超时，先检查两件事：
+
+- Root document 必须是 `myThesis.tex`，Compiler 必须是 XeLaTeX。
+
 
 ## 从 Word 切换到 LaTeX
 
