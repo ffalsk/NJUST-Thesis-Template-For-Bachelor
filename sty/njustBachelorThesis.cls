@@ -153,6 +153,7 @@
 \newcommand{\NJUST@supervisor}{}
 \newcommand{\NJUST@supervisortitle}{}
 \newcommand{\NJUST@ensupervisor}{}
+\newcommand{\NJUST@ensupervisortitle}{Prof.}
 \newcommand{\NJUST@college}{}
 \newcommand{\NJUST@major}{}
 \newcommand{\NJUST@field}{}
@@ -179,8 +180,9 @@
   \renewcommand{\NJUST@supervisor}{#1}%
   \renewcommand{\NJUST@supervisortitle}{#2}%
 }
-\newcommand{\njustenglishsupervisor}[1]{%
-  \renewcommand{\NJUST@ensupervisor}{#1}%
+\newcommand{\njustenglishsupervisor}[2][Prof.]{%
+  \renewcommand{\NJUST@ensupervisortitle}{#1}%
+  \renewcommand{\NJUST@ensupervisor}{#2}%
 }
 \newcommand{\njustcollege}[1]{\renewcommand{\NJUST@college}{#1}}
 \newcommand{\njustmajor}[1]{\renewcommand{\NJUST@major}{#1}}
@@ -238,7 +240,7 @@
       {{\rmfamily\bfseries\fontsize{18pt}{18pt}\selectfont\NJUST@studentid}};
 
     % 只有一个指导教师时，按示例把导师信息放在原第二行位置。
-    \NJUST@coverrow{191mm}{指 导 教 师}{\kaishu\zihao{4}\NJUST@supervisor\qquad{\kaishu\bfseries\zihao{4}\underline\NJUST@supervisortitle}}
+    \NJUST@coverrow{191mm}{指 导 教 师}{\kaishu\zihao{4}\NJUST@supervisor\quad{\kaishu\bfseries\zihao{4}\underline\NJUST@supervisortitle}}
     \NJUST@coverrow{201mm}{学 生 学 院}{\zihao{4}\NJUST@college}
     \NJUST@coverrow{211mm}{专 业}{\zihao{4}\NJUST@major}
     \NJUST@coverrow{221mm}{研 究 方 向}{\zihao{4}\NJUST@field}
@@ -289,7 +291,8 @@
     \node[anchor=north,align=center,inner sep=0pt] at ($(current page.north)+(0,-110mm)$)
       {{\rmfamily\itshape\fontsize{18pt}{18pt}\selectfont \NJUST@enauthor}};
     \node[anchor=north,align=center,inner sep=0pt] at ($(current page.north)+(0,-142mm)$)
-      {{\rmfamily\itshape\fontsize{18pt}{18pt}\selectfont Supervised by Prof. \NJUST@ensupervisor}};
+      {{\rmfamily\itshape\fontsize{18pt}{18pt}\selectfont
+        Supervised by \ifblank{\NJUST@ensupervisortitle}{}{\NJUST@ensupervisortitle\space}\NJUST@ensupervisor}};
     \node[anchor=north,align=center,inner sep=0pt] at ($(current page.north)+(0,-221mm)$)
       {{\rmfamily\bfseries\fontsize{18pt}{18pt}\selectfont Nanjing University of Science \& Technology}};
     \node[anchor=north,align=center,inner sep=0pt] at ($(current page.north)+(0,-233mm)$)
@@ -455,10 +458,10 @@
 \newlength{\NJUST@displaybelowskip}
 \newlength{\NJUST@displayshortaboveskip}
 \newlength{\NJUST@displayshortbelowskip}
-\setlength{\NJUST@displayaboveskip}{8pt}
+\setlength{\NJUST@displayaboveskip}{-8pt}
 \setlength{\NJUST@displaybelowskip}{8pt}
-\setlength{\NJUST@displayshortaboveskip}{6pt}
-\setlength{\NJUST@displayshortbelowskip}{6pt}
+\setlength{\NJUST@displayshortaboveskip}{-8pt}
+\setlength{\NJUST@displayshortbelowskip}{8pt}
 \AtBeginDocument{%
   \setlength{\abovedisplayskip}{\NJUST@displayaboveskip}%
   \setlength{\belowdisplayskip}{\NJUST@displaybelowskip}%

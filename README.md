@@ -122,7 +122,7 @@ Word 模板的封面、中文题名页、英文题名页和页眉对标题的排
 \njuststudentid{1234567445}
 
 \njustsupervisor{爱丽丝}{教授}
-\njustenglishsupervisor{Alice}
+\njustenglishsupervisor[Prof.]{Alice}
 
 \njustcollege{学院名称}
 \njustmajor{专业名称}
@@ -135,6 +135,16 @@ Word 模板的封面、中文题名页、英文题名页和页眉对标题的排
 ```tex
 \njusttitlelines{只有一行的中文题名}{}
 ```
+
+英文导师头衔写在 `\njustenglishsupervisor` 的方括号里，例如：
+
+```tex
+\njustenglishsupervisor[Prof.]{Alice}
+\njustenglishsupervisor[Associate Prof.]{Alice}
+\njustenglishsupervisor[Dr.]{Alice}
+```
+
+如果不写方括号，默认使用 `Prof.`。
 
 ## 摘要和关键词
 
@@ -312,20 +322,4 @@ Write the English abstract here.
 - 附录小标题上下空白：`\NJUST@appendixitembeforeskip`、`\NJUST@appendixitemafterskip`
 - 参考文献样式：`\NJUST@bibstyle`
 
-## GitHub 提交说明
 
-已添加 `.gitignore`，默认忽略 `build/`、根目录成品 `myThesis.pdf` 和本地 `template reference/` 目录。`img/logo/njust.pdf` 不会被忽略，因为它是模板需要的 logo 文件。
-
-建议提交这些内容：
-
-- `myThesis.tex`
-- `README.md`
-- `.gitignore`
-- `.latexmkrc`
-- `.vscode/settings.json`
-- `sty/`
-- `tex/`
-- `bib/`
-- `img/`
-
-不建议提交构建中间文件，也不建议把本地参考 Word/PDF 文档提交到公开仓库。
