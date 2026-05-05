@@ -655,6 +655,7 @@
   \begin{center}{\songti\bfseries\zihao{3}图表目录}\end{center}
   \vspace{1.5pt}
   {\setlength{\baselineskip}{20pt}\selectfont
+    \let\addvspace\@gobble
     \@starttoc{lof}\par\vspace{10pt}\@starttoc{lot}%
   }%
   \clearpage
