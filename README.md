@@ -263,6 +263,16 @@ Write the English abstract here.
 }
 ```
 
+英文析出文献题名会按 GB/T 7714 的常见要求处理成句子大小写。BibTeX 无法自动判断哪些词是专有名词或缩写，因此需要在 `.bib` 中用花括号保护必须保留大小写的内容：
+
+```bibtex
+title = {A review of artificial intelligence ({AI}) in education from 2010 to 2020}
+title = {Overview of {AI} and communication for {6G} network}
+title = {Microstructure of {TiO2} nanotubes}
+```
+
+不要把整句标题都包成双层花括号，除非你明确不希望参考文献样式调整大小写。通常只保护 `AI`、`6G`、`TiO2`、`NJUST` 这类缩写、化学式、专有名词即可。
+
 模板中目前保留了：
 
 ```tex
