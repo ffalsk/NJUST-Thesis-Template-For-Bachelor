@@ -739,10 +739,10 @@
 }{\clearpage}
 
 \newcommand{\njustkeywords}[1]{%
-  \vspace{46pt}\par\noindent{\songti\bfseries\zihao{4}关键词：}\songti\zihao{-4}#1\par
+  \vspace{46pt}\par\noindent{\songti\bfseries\zihao{4}关键词：}\songti\zihao{-4}\setlength{\baselineskip}{20pt}\selectfont#1\par
 }
 \newcommand{\njustenkeywords}[1]{%
-  \vspace{46pt}\par\noindent{\rmfamily\bfseries\zihao{4}Keywords:}\ \rmfamily\zihao{-4}#1\par
+  \vspace{46pt}\par\noindent{\rmfamily\bfseries\zihao{4}Keywords:}\ \rmfamily\zihao{-4}\setlength{\baselineskip}{20pt}\selectfont#1\par
 }
 
 % 致谢、附录、参考文献这类后置章节标题的上下位置。
