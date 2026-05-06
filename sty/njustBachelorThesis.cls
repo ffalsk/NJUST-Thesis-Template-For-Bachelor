@@ -132,15 +132,25 @@
 % Word 封面和中英文题名页对“换行位置”的要求不同，所以这里把题名分开：
 %   \njustcovertitle{封面第一行}{封面第二行}
 %   \njusttitlelines{中文题名页第一行}{中文题名页第二行}
-%   \njustenglishtitlelines{英文题名页第一行}{英文题名页第二行}
+%   \njustenglishtitlelines{英文题名页第一行}{第二行}{第三行}{第四行}
 %   \njustheadertitle{页眉里显示的短题名，不换行}
 % 注意：这里使用 \par 换行，让题名行距真正受 baselineskip 控制；
 % 不再使用 \\[8pt] 这种显式距离，否则 makechinesetitle 里的行距设置会失效。
 % 本科模板目前只保留一个指导教师；如需恢复第二导师，优先在封面命令区扩展。
 \newlength{\NJUST@chineseTitleBaselineskip}
 \newlength{\NJUST@englishTitleBaselineskip}
+\newlength{\NJUST@englishTitleDownshift}
+\newlength{\NJUST@englishInfoDownshift}
+\newlength{\NJUST@englishTitleY}
+\newlength{\NJUST@englishByY}
+\newlength{\NJUST@englishAuthorY}
+\newlength{\NJUST@englishSupervisorY}
 \setlength{\NJUST@chineseTitleBaselineskip}{32pt}
 \setlength{\NJUST@englishTitleBaselineskip}{38pt}
+% 英文题名页上半部分整体下移量；底部学校/日期不受影响。
+\setlength{\NJUST@englishTitleDownshift}{-10mm}
+\newcount\NJUST@englishTitleLineCount
+\newcount\NJUST@englishTitleExtraLines
 
 \newcommand{\NJUST@logo}{img/logo/njust.pdf}
 \newcommand{\NJUST@title}{}
@@ -190,9 +200,27 @@
 \newcommand{\njustsubmitdate}[1]{\renewcommand{\NJUST@submitdate}{#1}}
 \newcommand{\njustschool}[1]{\renewcommand{\NJUST@school}{#1}}
 \newcommand{\njustdate}[1]{\renewcommand{\NJUST@date}{#1}}
-\newcommand{\njustenglishtitle}[1]{\renewcommand{\NJUST@entitle}{#1}}
-\newcommand{\njustenglishtitlelines}[2]{%
-  \renewcommand{\NJUST@entitle}{#1\par #2}%
+\newcommand{\NJUST@appendenglishtitleline}[1]{%
+  \ifblank{#1}{}{%
+    \ifblank{\NJUST@entitle}{%
+      \renewcommand{\NJUST@entitle}{#1}%
+    }{%
+      \g@addto@macro\NJUST@entitle{\par #1}%
+    }%
+    \advance\NJUST@englishTitleLineCount by 1\relax
+  }%
+}
+\NewDocumentCommand{\njustenglishtitle}{m}{%
+  \renewcommand{\NJUST@entitle}{#1}%
+  \NJUST@englishTitleLineCount=1\relax
+}
+\NewDocumentCommand{\njustenglishtitlelines}{m m g g}{%
+  \renewcommand{\NJUST@entitle}{}%
+  \NJUST@englishTitleLineCount=0\relax
+  \NJUST@appendenglishtitleline{#1}%
+  \NJUST@appendenglishtitleline{#2}%
+  \IfNoValueF{#3}{\NJUST@appendenglishtitleline{#3}}%
+  \IfNoValueF{#4}{\NJUST@appendenglishtitleline{#4}}%
 }
 \newcommand{\njustenglishdate}[1]{\renewcommand{\NJUST@endate}{#1}}
 
@@ -277,25 +305,44 @@
 
 % 第三页英文题名页。
 % 英文题名行距调 \NJUST@englishTitleBaselineskip。
+% 英文标题支持 1--4 行。多于两行时，作者和导师按新增行数同步下移；底部学校不动。
+\newcommand{\NJUST@setEnglishTitleLayout}{%
+  \setlength{\NJUST@englishInfoDownshift}{\NJUST@englishTitleDownshift}%
+  \NJUST@englishTitleExtraLines=\NJUST@englishTitleLineCount
+  \advance\NJUST@englishTitleExtraLines by -2\relax
+  \@whilenum\NJUST@englishTitleExtraLines>0\do{%
+    \addtolength{\NJUST@englishInfoDownshift}{\NJUST@englishTitleBaselineskip}%
+    \advance\NJUST@englishTitleExtraLines by -1\relax
+  }%
+  \setlength{\NJUST@englishTitleY}{66mm}%
+  \addtolength{\NJUST@englishTitleY}{\NJUST@englishTitleDownshift}%
+  \setlength{\NJUST@englishByY}{100mm}%
+  \addtolength{\NJUST@englishByY}{\NJUST@englishInfoDownshift}%
+  \setlength{\NJUST@englishAuthorY}{110mm}%
+  \addtolength{\NJUST@englishAuthorY}{\NJUST@englishInfoDownshift}%
+  \setlength{\NJUST@englishSupervisorY}{142mm}%
+  \addtolength{\NJUST@englishSupervisorY}{\NJUST@englishInfoDownshift}%
+}
 \newcommand{\makeenglishtitle}{%
   \thispagestyle{empty}%
+  \NJUST@setEnglishTitleLayout
   \begin{tikzpicture}[remember picture,overlay]
-    \node[anchor=north,inner sep=0pt] at ($(current page.north)+(0,-66mm)$)
+    \node[anchor=north,inner sep=0pt] at ($(current page.north)+(0,-\NJUST@englishTitleY)$)
       {\begin{minipage}{160mm}
         \centering
         \rmfamily\bfseries\zihao{2}\setlength{\baselineskip}{\NJUST@englishTitleBaselineskip}\selectfont
         \NJUST@entitle
       \end{minipage}};
-    \node[anchor=north,align=center,inner sep=0pt] at ($(current page.north)+(0,-100mm)$)
+    \node[anchor=north,align=center,inner sep=0pt] at ($(current page.north)+(0,-\NJUST@englishByY)$)
       {{\rmfamily\itshape\fontsize{18pt}{18pt}\selectfont By}};
-    \node[anchor=north,align=center,inner sep=0pt] at ($(current page.north)+(0,-110mm)$)
+    \node[anchor=north,align=center,inner sep=0pt] at ($(current page.north)+(0,-\NJUST@englishAuthorY)$)
       {{\rmfamily\itshape\fontsize{18pt}{18pt}\selectfont \NJUST@enauthor}};
-    \node[anchor=north,align=center,inner sep=0pt] at ($(current page.north)+(0,-142mm)$)
+    \node[anchor=north,align=center,inner sep=0pt] at ($(current page.north)+(0,-\NJUST@englishSupervisorY)$)
       {{\rmfamily\itshape\fontsize{18pt}{18pt}\selectfont
         Supervised by \ifblank{\NJUST@ensupervisortitle}{}{\NJUST@ensupervisortitle\space}\NJUST@ensupervisor}};
-    \node[anchor=north,align=center,inner sep=0pt] at ($(current page.north)+(0,-221mm)$)
+    \node[anchor=north,align=center,inner sep=0pt] at ($(current page.north)+(0,-225mm)$)
       {{\rmfamily\bfseries\fontsize{18pt}{18pt}\selectfont Nanjing University of Science \& Technology}};
-    \node[anchor=north,align=center,inner sep=0pt] at ($(current page.north)+(0,-233mm)$)
+    \node[anchor=north,align=center,inner sep=0pt] at ($(current page.north)+(0,-237mm)$)
       {{\rmfamily\bfseries\fontsize{18pt}{18pt}\selectfont\NJUST@endate}};
   \end{tikzpicture}%
   \clearpage

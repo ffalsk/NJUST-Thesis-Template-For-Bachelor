@@ -136,6 +136,16 @@ Word 模板的封面、中文题名页、英文题名页和页眉对标题的排
 \njusttitlelines{只有一行的中文题名}{}
 ```
 
+英文题名页支持 1--4 行。长题名建议手动拆成多行，不要依赖自动换行；模板会根据行数下移作者和导师，底部学校与日期位置不变：
+
+```tex
+\njustenglishtitlelines
+  {English Title Line 1}
+  {English Title Line 2}
+  {English Title Line 3}
+  {English Title Line 4}
+```
+
 英文导师头衔写在 `\njustenglishsupervisor` 的方括号里，例如：
 
 ```tex
