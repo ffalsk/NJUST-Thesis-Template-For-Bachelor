@@ -20,7 +20,7 @@
 \DeclareOption*{\PassOptionsToClass{\CurrentOption}{ctexbook}}
 \ProcessOptions\relax
 
-\LoadClass[UTF8,a4paper,zihao=-4,openany,twoside,fontset=windows]{ctexbook}
+\LoadClass[UTF8,a4paper,zihao=-4,openany,twoside,fontset=none]{ctexbook}
 
 % 只保留模板自身需要的包。正文若需要算法、代码、高级表格等扩展，
 % 建议在 myThesis.tex 中额外加载，避免 class 变重。
@@ -69,13 +69,11 @@
 \IfFontExistsTF{Times New Roman}{\setmainfont{Times New Roman}}{}
 \IfFontExistsTF{Arial}{\setsansfont{Arial}}{}
 \IfFontExistsTF{Consolas}{\setmonofont{Consolas}}{}
-% 中文宋体/黑体/楷体由 ctexbook 的 fontset=windows 提供：
-%   \songti, \heiti, \kaishu
-% 如果要换成其它中文字体，优先改 \LoadClass 的 fontset，
-% 或在这里重新启用 \setCJKmainfont / \setCJKfamilyfont。
+% 中文宋体/黑体/楷体由下面的 \setCJK... 手动定义。
+% 这里不用 ctexbook 的 fontset=windows，是为了避免 ctex 先定义字体族，
+% 然后本模板再次定义时触发 xeCJK 的 Redefining CJKfamily 警告。
 
 % 中文粗体粗细统一控制。
-% ctex 的 Windows 字体集里，部分中文粗体可能会走较重的字体或默认伪粗；
 % 这里显式把宋体、黑体、楷体的 \bfseries 绑定到可调 FakeBold。
 % 数值越大越粗；如果比 Word 粗，先试 1.1--1.3；如果太细，试 1.5--1.8。
 \newcommand{\NJUST@CJKBoldFake}{3.0}
@@ -102,6 +100,12 @@
     BoldFeatures = { FakeBold = \NJUST@CJKBoldFake }
   ]%
 }{}
+
+% fontset=none 时 ctex 不会自动提供 \songti / \heiti / \kaishu。
+% 这里把模板内部使用的字体命令映射到上面手动定义的 CJK 字体族。
+\providecommand{\songti}{\CJKfamily{zhsong}}
+\providecommand{\heiti}{\CJKfamily{zhhei}}
+\providecommand{\kaishu}{\CJKfamily{zhkai}}
 
 % 正文：小四号宋体，固定 20 磅行距，首行缩进 2 字符。
 % 如果正文整体显得太松/太紧，只改 \NJUST@bodyfont 里的 baselineskip。
