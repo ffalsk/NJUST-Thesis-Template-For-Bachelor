@@ -859,11 +859,15 @@
 \renewcommand{\bibsection}{\NJUST@bibheading}
 \renewcommand{\bibfont}{\NJUST@bodyfont}
 \setlength{\bibsep}{3pt}
+\newlength{\NJUST@biblisttopsep}
+\setlength{\NJUST@biblisttopsep}{10pt}
 
 % 参考文献列表对齐：
 %   [1]、[10] 等序号左边对齐；
 %   文献正文统一从序号盒子后开始，续行也和正文起点对齐。
 % 如果正文离序号太近/太远，只调 \NJUST@biblabelsep。
+% topsep/itemsep/parsep 全部使用固定长度，不给 plus/minus 伸缩量，
+% 避免 LaTeX 为了排满页面主动压缩参考文献标题和列表之间、文献条目之间的空白。
 \newlength{\NJUST@biblabelwidth}
 \newlength{\NJUST@biblabelsep}
 \newcommand{\NJUST@biblabeltext}[1]{[#1]}
@@ -877,8 +881,11 @@
   \setlength{\labelsep}{\NJUST@biblabelsep}%
   \setlength{\leftmargin}{\labelwidth}%
   \addtolength{\leftmargin}{\labelsep}%
+  \setlength{\topsep}{\NJUST@biblisttopsep}%
+  \setlength{\partopsep}{\z@}%
   \setlength{\itemsep}{\bibsep}%
   \setlength{\parsep}{\z@}%
+  \setlength{\parskip}{\z@}%
   \def\makelabel##1{##1}%
   \ifNAT@openbib
     \addtolength{\leftmargin}{\bibindent}%
