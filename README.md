@@ -335,6 +335,9 @@ title = {Microstructure of {TiO2} nanotubes}
 - 封面坐标：`Cover And Title Pages`
 - 标题段前段后：`Headings` 的 `beforeskip` 和 `afterskip`
 - 公式上下空白：`\NJUST@display...skip`
+- 图题/表题行距和间距：`\NJUST@captionfont`、`\NJUST@figurecaptionskip`、`\NJUST@figurecaptionbelowskip`、`\NJUST@tablecaptionaboveskip`、`\NJUST@tablecaptionskip`
+- 图表整体与正文的上方基础空白：`\NJUST@floattextsep`
+- 图表下方额外收紧量：`\NJUST@floatbelowsqueeze`
 - 表格宽度和行距：`\NJUST@tablewidth`、`\NJUST@tablearraystretch`
 - 目录缩进：`\NJUST@toc...` 系列长度
 - 图表目录编号后空白：`\NJUST@lofgap`

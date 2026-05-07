@@ -59,6 +59,7 @@
   headsep=6mm,
   footskip=6mm
 }
+\raggedbottom
 
 % ----------------------------------------------------------------------
 % Fonts And Body Text
@@ -435,9 +436,11 @@
 %   二级标题（条）：  四号加粗宋体，段前/段后 12 磅，居左。
 %   三级标题（款）：  小四号加粗宋体，段前/段后 6 磅，居左。
 %   四级标题（项）：  小四号宋体，行距 20 磅，按正文处理。
-% LaTeX 的 beforeskip/afterskip 不完全等同 Word 的“段前/段后”：
-% Word 标题段落还带固定 20 磅行距的段落盒子，直接写 18/12/6 会比示例偏紧。
-% 下面数值是按 Word 样张视觉效果换算后的 LaTeX 跳距。
+% 标题模型参考 template reference/NjustThesis/sty/njustThesis.cfg。
+% beforeskip/afterskip 继续使用规范给出的段前/段后数值：
+%   chapter 0/18pt（章标题通常在页首）、section 12/12pt、subsection 6/6pt。
+% Word 中标题段落本身也是固定 20 磅行距，所以这里额外让标题行按 20pt
+% 的段落盒子排版；这样标题不会只贴着上一行/下一行的一侧。
 % 如果标题上下空白不准，只改 beforeskip/afterskip。
 % aftername 控制“编号”和“标题文字”之间的距离；这里不用 \quad，
 % 否则会像制表位一样偏宽。0.5em 约等于一个普通英文空格。
@@ -447,27 +450,24 @@
     name = {},
     number = \arabic{chapter},
     aftername = \hspace{0.5em},
-    format = \songti\bfseries\zihao{-3}\setlength{\baselineskip}{20pt}\selectfont\raggedright,
-    beforeskip = 20bp,
-    afterskip = 27bp,
-    fixskip = true,
+    format = \songti\bfseries\large\setlength{\baselineskip}{20pt}\selectfont\raggedright,
+    beforeskip = 0pt,
+    afterskip = 18pt,
     afterindent = true,
     pagestyle = njustmain
   },
   section = {
     format = \songti\bfseries\zihao{4}\setlength{\baselineskip}{20pt}\selectfont\raggedright,
     aftername = \hspace{0.5em},
-    beforeskip = 20bp,
-    afterskip = 20bp,
-    fixskip = true,
+    beforeskip = 12pt,
+    afterskip = 12pt,
     afterindent = true
   },
   subsection = {
-    format = \songti\bfseries\zihao{-4}\setlength{\baselineskip}{20pt}\selectfont\raggedright,
+    format = \songti\bfseries\normalsize\setlength{\baselineskip}{20pt}\selectfont\raggedright,
     aftername = \hspace{0.5em},
-    beforeskip = 9bp,
-    afterskip = 15bp,
-    fixskip = true,
+    beforeskip = 6pt,
+    afterskip = 6pt,
     afterindent = true
   },
   subsubsection = {
@@ -530,16 +530,35 @@
 %   \NJUST@tablewidth       控制 booktabs 横线和表体总宽度；
 %   \NJUST@tablecolsep      控制列内左右空白；
 %   \NJUST@tablearraystretch 控制表格行高。
+% 图题/表题行距按正文要求固定 20 磅。
+% NjustThesis 主文件实际还会加载 sty/custom.sty，其中 figure/table 的 skip 都是 1pt。
+% 这里保留图片当前观感，只把表题到表体的距离按参考模板收紧到 1pt。
+% 图片与图题距离调 \NJUST@figurecaptionskip。
+% 图/表浮动体和正文之间的外侧基础空白统一调 \NJUST@floattextsep。
+% 如果上方正好、下方偏宽，只调 \NJUST@floatbelowsqueeze；它会统一收紧图和表的下方空白。
+% 表格前空白调 \NJUST@tablecaptionaboveskip，表题和表体之间距离调 \NJUST@tablecaptionskip。
 \newlength{\NJUST@tablewidth}
 \newlength{\NJUST@tablecolsep}
+\newlength{\NJUST@figurecaptionskip}
+\newlength{\NJUST@figurecaptionbelowskip}
+\newlength{\NJUST@tablecaptionaboveskip}
+\newlength{\NJUST@tablecaptionskip}
+\newlength{\NJUST@floattextsep}
+\newlength{\NJUST@floatbelowsqueeze}
 \newlength{\NJUST@twocolwidth}
 \newlength{\NJUST@threecolwidth}
 \setlength{\NJUST@tablewidth}{0.86\textwidth}
 \setlength{\NJUST@tablecolsep}{6pt}
+\setlength{\NJUST@figurecaptionskip}{6pt}
+\setlength{\NJUST@figurecaptionbelowskip}{0pt}
+\setlength{\NJUST@tablecaptionaboveskip}{0pt}
+\setlength{\NJUST@tablecaptionskip}{1pt}
+\setlength{\NJUST@floattextsep}{10pt}
+\setlength{\NJUST@floatbelowsqueeze}{6pt}
 \newcommand{\NJUST@tablearraystretch}{1.18}
 \newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
 \newcommand{\NJUST@captionfont}{%
-  \songti\zihao{5}\setlength{\baselineskip}{14pt}\selectfont
+  \songti\zihao{5}\setlength{\baselineskip}{20pt}\selectfont
 }
 \newcommand{\NJUST@tablefont}{%
   \songti\zihao{5}\setlength{\baselineskip}{14pt}\selectfont
@@ -552,8 +571,18 @@
   justification=centering,
   singlelinecheck=false
 }
-\captionsetup[figure]{position=bottom,skip=6pt}
-\captionsetup[table]{position=top,skip=6pt}
+\captionsetup[figure]{%
+  position=bottom,
+  skip=\NJUST@figurecaptionskip,
+  belowskip=\NJUST@figurecaptionbelowskip
+}
+\captionsetup[table]{%
+  position=top,
+  aboveskip=\NJUST@tablecaptionaboveskip,
+  skip=\NJUST@tablecaptionskip
+}
+\AtEndEnvironment{figure}{\vspace*{-\NJUST@floatbelowsqueeze}}
+\AtEndEnvironment{table}{\vspace*{-\NJUST@floatbelowsqueeze}}
 
 % 让正文里的普通 tabular 默认变成定宽表格，效果更接近 Word 示例。
 % 常见的 {cc}/{ccc} 会转成等宽居中列：横线仍较宽，但每列内容在自己的列中居中，
@@ -578,8 +607,10 @@
   \end{tabular*}%
 }
 
-% 浮动体排版：尽量允许图表就近放置；如果被挤到单独浮动页，
-% 不使用 LaTeX 默认的垂直居中，而是靠页面上方放置。
+% 浮动体排版：尽量允许图表就近放置。
+% 这里使用固定间距，不使用 plus/minus 伸缩胶水；否则 book/ctexbook 默认的 flushbottom
+% 会把浮动体上下空白拉大，出现表格下面“空出一大坨”的情况。
+% \raggedbottom 在 Page Layout 小节中启用，使页面下方自然留白，排版更接近 Word。
 \setcounter{topnumber}{5}
 \setcounter{bottomnumber}{5}
 \setcounter{totalnumber}{8}
@@ -587,11 +618,11 @@
 \renewcommand{\bottomfraction}{0.95}
 \renewcommand{\textfraction}{0.05}
 \renewcommand{\floatpagefraction}{0.75}
-\setlength{\floatsep}{12pt plus 2pt minus 2pt}
-\setlength{\textfloatsep}{14pt plus 2pt minus 2pt}
-\setlength{\intextsep}{12pt plus 2pt minus 2pt}
+\setlength{\floatsep}{\NJUST@floattextsep}
+\setlength{\textfloatsep}{\NJUST@floattextsep}
+\setlength{\intextsep}{\NJUST@floattextsep}
 \setlength{\@fptop}{0pt}
-\setlength{\@fpsep}{12pt plus 1fil}
+\setlength{\@fpsep}{\NJUST@floattextsep}
 \setlength{\@fpbot}{0pt plus 1fil}
 
 % ----------------------------------------------------------------------
