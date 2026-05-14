@@ -141,8 +141,7 @@
 %   \njustheadertitle{页眉里显示的短题名，不换行}
 % 注意：这里使用 \par 换行，让题名行距真正受 baselineskip 控制；
 % 不再使用 \\[8pt] 这种显式距离，否则 makechinesetitle 里的行距设置会失效。
-% 中文/英文题名页默认显示一个指导教师；填写校外导师时同步追加显示。
-% 封面保留校外导师横线，没有校外导师时留空。
+% 中文/英文题名页只显示一个指导教师；封面保留第二条空横线。
 \newlength{\NJUST@chineseTitleBaselineskip}
 \newlength{\NJUST@englishTitleBaselineskip}
 \newlength{\NJUST@englishTitleDownshift}
@@ -168,11 +167,8 @@
 \newcommand{\NJUST@studentid}{}
 \newcommand{\NJUST@supervisor}{}
 \newcommand{\NJUST@supervisortitle}{}
-\newcommand{\NJUST@externalsupervisor}{}
-\newcommand{\NJUST@externalsupervisortitle}{}
 \newcommand{\NJUST@ensupervisor}{}
 \newcommand{\NJUST@ensupervisortitle}{Prof.}
-\newcommand{\NJUST@enexternalsupervisor}{}
 \newcommand{\NJUST@college}{}
 \newcommand{\NJUST@major}{}
 \newcommand{\NJUST@field}{}
@@ -199,16 +195,9 @@
   \renewcommand{\NJUST@supervisor}{#1}%
   \renewcommand{\NJUST@supervisortitle}{#2}%
 }
-\newcommand{\njustexternalsupervisor}[2]{%
-  \renewcommand{\NJUST@externalsupervisor}{#1}%
-  \renewcommand{\NJUST@externalsupervisortitle}{#2}%
-}
 \newcommand{\njustenglishsupervisor}[2][Prof.]{%
   \renewcommand{\NJUST@ensupervisortitle}{#1}%
   \renewcommand{\NJUST@ensupervisor}{#2}%
-}
-\newcommand{\njustenglishexternalsupervisor}[1]{%
-  \renewcommand{\NJUST@enexternalsupervisor}{#1}%
 }
 \newcommand{\njustcollege}[1]{\renewcommand{\NJUST@college}{#1}}
 \newcommand{\njustmajor}[1]{\renewcommand{\NJUST@major}{#1}}
@@ -267,10 +256,6 @@
 }
 \newcommand{\NJUST@coverexternalrow}[1]{%
   \draw[line width=.45pt] ($(current page.north west)+(79mm,-#1-2.8mm)$) -- ($(current page.north west)+(168mm,-#1-2.8mm)$);
-  \ifx\NJUST@externalsupervisor\@empty\else
-    \node[anchor=base,inner sep=0pt] at ($(current page.north west)+(124.5mm,-#1-0.2mm)$)
-      {{\kaishu\zihao{4}\NJUST@externalsupervisor\quad{\kaishu\bfseries\zihao{4}\underline\NJUST@externalsupervisortitle}（校外）}};
-  \fi
 }
 
 \newcommand{\makecover}{%
@@ -327,11 +312,6 @@
       {{\kaishu\bfseries\fontsize{18pt}{18pt}\selectfont 作\qquad 者：\NJUST@author}};
     \node[anchor=west,inner sep=0pt] at ($(current page.north west)+(63mm,-134mm)$)
       {{\kaishu\bfseries\fontsize{18pt}{18pt}\selectfont 指导教师：\NJUST@supervisor\quad \NJUST@supervisortitle}};
-    \ifx\NJUST@externalsupervisor\@empty\else
-      \node[anchor=west,inner sep=0pt] at ($(current page.north west)+(95mm,-146mm)$)
-        {{\kaishu\bfseries\fontsize{18pt}{18pt}\selectfont
-          \NJUST@externalsupervisor\quad \NJUST@externalsupervisortitle（校外）}};
-    \fi
 
     \node[anchor=north,align=center,inner sep=0pt] at ($(current page.north)+(0,-230mm)$)
       {{\songti\bfseries\fontsize{18pt}{18pt}\selectfont\ziju{0.25}\NJUST@school}};
@@ -377,8 +357,7 @@
       {{\rmfamily\itshape\fontsize{18pt}{18pt}\selectfont \NJUST@enauthor}};
     \node[anchor=north,align=center,inner sep=0pt] at ($(current page.north)+(0,-\NJUST@englishSupervisorY)$)
       {{\rmfamily\itshape\fontsize{18pt}{18pt}\selectfont
-        Supervised by \ifblank{\NJUST@ensupervisortitle}{}{\NJUST@ensupervisortitle\space}\NJUST@ensupervisor
-        \ifx\NJUST@enexternalsupervisor\@empty\else\space\&\space\NJUST@enexternalsupervisor\fi}};
+        Supervised by \ifblank{\NJUST@ensupervisortitle}{}{\NJUST@ensupervisortitle\space}\NJUST@ensupervisor}};
     \node[anchor=north,align=center,inner sep=0pt] at ($(current page.north)+(0,-225mm)$)
       {{\rmfamily\fontsize{18pt}{18pt}\selectfont Nanjing University of Science \& Technology}};
     \node[anchor=north,align=center,inner sep=0pt] at ($(current page.north)+(0,-237mm)$)
