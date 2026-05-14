@@ -141,7 +141,8 @@
 %   \njustheadertitle{页眉里显示的短题名，不换行}
 % 注意：这里使用 \par 换行，让题名行距真正受 baselineskip 控制；
 % 不再使用 \\[8pt] 这种显式距离，否则 makechinesetitle 里的行距设置会失效。
-% 本科模板目前只保留一个指导教师；如需恢复第二导师，优先在封面命令区扩展。
+% 中文/英文题名页默认显示一个指导教师；填写校外导师时同步追加显示。
+% 封面保留校外导师横线，没有校外导师时留空。
 \newlength{\NJUST@chineseTitleBaselineskip}
 \newlength{\NJUST@englishTitleBaselineskip}
 \newlength{\NJUST@englishTitleDownshift}
@@ -151,7 +152,7 @@
 \newlength{\NJUST@englishAuthorY}
 \newlength{\NJUST@englishSupervisorY}
 \setlength{\NJUST@chineseTitleBaselineskip}{32pt}
-\setlength{\NJUST@englishTitleBaselineskip}{38pt}
+\setlength{\NJUST@englishTitleBaselineskip}{32pt}
 % 英文题名页上半部分整体下移量；底部学校/日期不受影响。
 \setlength{\NJUST@englishTitleDownshift}{-10mm}
 \newcount\NJUST@englishTitleLineCount
@@ -167,8 +168,11 @@
 \newcommand{\NJUST@studentid}{}
 \newcommand{\NJUST@supervisor}{}
 \newcommand{\NJUST@supervisortitle}{}
+\newcommand{\NJUST@externalsupervisor}{}
+\newcommand{\NJUST@externalsupervisortitle}{}
 \newcommand{\NJUST@ensupervisor}{}
 \newcommand{\NJUST@ensupervisortitle}{Prof.}
+\newcommand{\NJUST@enexternalsupervisor}{}
 \newcommand{\NJUST@college}{}
 \newcommand{\NJUST@major}{}
 \newcommand{\NJUST@field}{}
@@ -195,9 +199,16 @@
   \renewcommand{\NJUST@supervisor}{#1}%
   \renewcommand{\NJUST@supervisortitle}{#2}%
 }
+\newcommand{\njustexternalsupervisor}[2]{%
+  \renewcommand{\NJUST@externalsupervisor}{#1}%
+  \renewcommand{\NJUST@externalsupervisortitle}{#2}%
+}
 \newcommand{\njustenglishsupervisor}[2][Prof.]{%
   \renewcommand{\NJUST@ensupervisortitle}{#1}%
   \renewcommand{\NJUST@ensupervisor}{#2}%
+}
+\newcommand{\njustenglishexternalsupervisor}[1]{%
+  \renewcommand{\NJUST@enexternalsupervisor}{#1}%
 }
 \newcommand{\njustcollege}[1]{\renewcommand{\NJUST@college}{#1}}
 \newcommand{\njustmajor}[1]{\renewcommand{\NJUST@major}{#1}}
@@ -238,15 +249,28 @@
 %   current page.north west)+(43mm,-39mm) 里的 43mm 改横向，-39mm 改纵向。
 % “毕业设计（论文）报告”按要求为楷体加粗。
 \newcommand{\NJUST@coverlabel}[1]{%
-  {\hbadness=10000\songti\bfseries\zihao{4}\makebox[35mm][s]{#1}}%
+  {\hbadness=10000\songti\bfseries\zihao{4}\makebox[31mm][s]{#1}}%
 }
 \newcommand{\NJUST@covervalue}[1]{%
   {\kaishu\bfseries\zihao{3}#1}%
 }
+\newcommand{\NJUST@coverstudentid}[1]{%
+  {\IfFontExistsTF{SimHei}{\fontspec{SimHei}[FakeBold=\NJUST@CJKBoldFake]}{\heiti\bfseries}\fontsize{18pt}{18pt}\selectfont#1}%
+}
 \newcommand{\NJUST@coverrow}[3]{%
-  \node[anchor=west,inner sep=0pt] at ($(current page.north west)+(43mm,-#1)$) {\NJUST@coverlabel{#2}};
+  \node[anchor=west,inner sep=0pt] at ($(current page.north west)+(41mm,-#1+1.4mm)$) {\NJUST@coverlabel{#2}};
   \draw[line width=.45pt] ($(current page.north west)+(79mm,-#1-2.8mm)$) -- ($(current page.north west)+(168mm,-#1-2.8mm)$);
-  \node[anchor=base,inner sep=0pt] at ($(current page.north west)+(123.5mm,-#1-0.2mm)$) {\NJUST@covervalue{#3}};
+  \node[anchor=base,inner sep=0pt] at ($(current page.north west)+(124.5mm,-#1-0.2mm)$) {\NJUST@covervalue{#3}};
+}
+\newcommand{\NJUST@coverblankrow}[1]{%
+  \draw[line width=.45pt] ($(current page.north west)+(79mm,-#1-2.8mm)$) -- ($(current page.north west)+(168mm,-#1-2.8mm)$);
+}
+\newcommand{\NJUST@coverexternalrow}[1]{%
+  \draw[line width=.45pt] ($(current page.north west)+(79mm,-#1-2.8mm)$) -- ($(current page.north west)+(168mm,-#1-2.8mm)$);
+  \ifx\NJUST@externalsupervisor\@empty\else
+    \node[anchor=base,inner sep=0pt] at ($(current page.north west)+(124.5mm,-#1-0.2mm)$)
+      {{\kaishu\zihao{4}\NJUST@externalsupervisor\quad{\kaishu\bfseries\zihao{4}\underline\NJUST@externalsupervisortitle}（校外）}};
+  \fi
 }
 
 \newcommand{\makecover}{%
@@ -268,15 +292,19 @@
     \draw[line width=.45pt] ($(current page.north west)+(77.5mm,-147.6mm)$) -- ($(current page.north west)+(132.5mm,-147.6mm)$);
     \node[anchor=base,inner sep=0pt] at ($(current page.north)+(0,-146.0mm)$)
       {{\kaishu\bfseries\fontsize{18pt}{18pt}\selectfont\NJUST@author}};
+    \node[anchor=north,inner sep=0pt] at ($(current page.north)+(0,-148.6mm)$)
+      {{\songti\zihao{-4}（学生姓名）}};
     \draw[line width=.45pt] ($(current page.north west)+(77.5mm,-161.2mm)$) -- ($(current page.north west)+(132.5mm,-161.2mm)$);
     \node[anchor=base,inner sep=0pt] at ($(current page.north)+(0,-159.6mm)$)
-      {{\rmfamily\bfseries\fontsize{18pt}{18pt}\selectfont\NJUST@studentid}};
+      {\NJUST@coverstudentid{\NJUST@studentid}};
+    \node[anchor=north,inner sep=0pt] at ($(current page.north)+(0,-162.2mm)$)
+      {{\songti\zihao{-4}（学号）}};
 
-    % 只有一个指导教师时，按示例把导师信息放在原第二行位置。
-    \NJUST@coverrow{191mm}{指 导 教 师}{\kaishu\zihao{4}\NJUST@supervisor\quad{\kaishu\bfseries\zihao{4}\underline\NJUST@supervisortitle}}
-    \NJUST@coverrow{201mm}{学 生 学 院}{\zihao{4}\NJUST@college}
-    \NJUST@coverrow{211mm}{专 业}{\zihao{4}\NJUST@major}
-    \NJUST@coverrow{221mm}{研 究 方 向}{\zihao{4}\NJUST@field}
+    \NJUST@coverrow{181mm}{指 导 教 师}{\kaishu\zihao{4}\NJUST@supervisor\hspace{5em}{\kaishu\bfseries\zihao{4}\underline\NJUST@supervisortitle}}
+    \NJUST@coverexternalrow{191mm}
+    \NJUST@coverrow{201mm}{学 生 学 院}{\songti\bfseries\zihao{4}\NJUST@college}
+    \NJUST@coverrow{211mm}{专 业}{\songti\bfseries\zihao{4}\NJUST@major}
+    \NJUST@coverrow{221mm}{研 究 方 向}{\songti\bfseries\zihao{4}\NJUST@field}
     \NJUST@coverrow{231mm}{提 交 时 间}{\songti\bfseries\zihao{4}\NJUST@submitdate}
   \end{tikzpicture}%
   \clearpage
@@ -299,6 +327,11 @@
       {{\kaishu\bfseries\fontsize{18pt}{18pt}\selectfont 作\qquad 者：\NJUST@author}};
     \node[anchor=west,inner sep=0pt] at ($(current page.north west)+(63mm,-134mm)$)
       {{\kaishu\bfseries\fontsize{18pt}{18pt}\selectfont 指导教师：\NJUST@supervisor\quad \NJUST@supervisortitle}};
+    \ifx\NJUST@externalsupervisor\@empty\else
+      \node[anchor=west,inner sep=0pt] at ($(current page.north west)+(95mm,-146mm)$)
+        {{\kaishu\bfseries\fontsize{18pt}{18pt}\selectfont
+          \NJUST@externalsupervisor\quad \NJUST@externalsupervisortitle（校外）}};
+    \fi
 
     \node[anchor=north,align=center,inner sep=0pt] at ($(current page.north)+(0,-230mm)$)
       {{\songti\bfseries\fontsize{18pt}{18pt}\selectfont\ziju{0.25}\NJUST@school}};
@@ -344,16 +377,27 @@
       {{\rmfamily\itshape\fontsize{18pt}{18pt}\selectfont \NJUST@enauthor}};
     \node[anchor=north,align=center,inner sep=0pt] at ($(current page.north)+(0,-\NJUST@englishSupervisorY)$)
       {{\rmfamily\itshape\fontsize{18pt}{18pt}\selectfont
-        Supervised by \ifblank{\NJUST@ensupervisortitle}{}{\NJUST@ensupervisortitle\space}\NJUST@ensupervisor}};
+        Supervised by \ifblank{\NJUST@ensupervisortitle}{}{\NJUST@ensupervisortitle\space}\NJUST@ensupervisor
+        \ifx\NJUST@enexternalsupervisor\@empty\else\space\&\space\NJUST@enexternalsupervisor\fi}};
     \node[anchor=north,align=center,inner sep=0pt] at ($(current page.north)+(0,-225mm)$)
-      {{\rmfamily\bfseries\fontsize{18pt}{18pt}\selectfont Nanjing University of Science \& Technology}};
+      {{\rmfamily\fontsize{18pt}{18pt}\selectfont Nanjing University of Science \& Technology}};
     \node[anchor=north,align=center,inner sep=0pt] at ($(current page.north)+(0,-237mm)$)
-      {{\rmfamily\bfseries\fontsize{18pt}{18pt}\selectfont\NJUST@endate}};
+      {{\rmfamily\fontsize{18pt}{18pt}\selectfont\NJUST@endate}};
   \end{tikzpicture}%
   \clearpage
 }
 
 % 声明页。这里的 30pt 行距来自 Word 示例的较疏排布。
+% 签名横线长度调 \NJUST@statementSignatureRule；
+% “年  月  日”的水平位置调 \NJUST@statementDateIndent，数值越大越靠右。
+\newlength{\NJUST@statementSignatureRule}
+\newlength{\NJUST@statementDateIndent}
+\setlength{\NJUST@statementSignatureRule}{30mm}
+\setlength{\NJUST@statementDateIndent}{32mm}
+\newcommand{\NJUST@statementsignline}{%
+  \noindent 学生签名：\rule{\NJUST@statementSignatureRule}{.45pt}%
+  \hspace{\NJUST@statementDateIndent}年\quad 月\quad 日\par
+}
 \newcommand{\makestatement}{%
   \thispagestyle{empty}%
   \vspace*{8pt}
@@ -362,13 +406,13 @@
   {\songti\zihao{4}\setlength{\baselineskip}{30pt}\selectfont\setlength{\parindent}{2em}
   \NJUST@firstparindent 本毕业设计（论文）是我在导师的指导下取得的研究成果，尽我所知，除了加以标注和致谢的部分外，不包含其他人已经发表或公布过的研究成果，也不包含我为获得任何教育机构的学位或学历而使用过的材料。与我一同工作的同事对本毕业设计（论文）做出的贡献均已在文中作了明确的说明。\par
   \vspace{37pt}
-  \noindent 学生签名：\rule{36mm}{.45pt}\hfill 年\quad 月\quad 日\hspace{48mm}\par
+  \NJUST@statementsignline
   \vspace{84pt}
   \begin{center}{\songti\bfseries\zihao{3}使用授权声明}\end{center}
   \vspace{-13pt}
   \NJUST@firstparindent 南京理工大学有权保存本文的电子和纸质文档，可以借阅或上网公布本文的部分或全部内容，可以向有关部门或机构送交并授权其保存、借阅或上网公布本文的部分或全部内容。对于保密论文，按保密的有关规定和程序处理。\par
   \vspace{36pt}
-  \noindent 学生签名：\rule{36mm}{.45pt}\hfill 年\quad 月\quad 日\hspace{48mm}\par
+  \NJUST@statementsignline
   }%
   \clearpage
 }
@@ -784,15 +828,15 @@
 \setlength{\NJUST@backtitlebeforeskip}{-4mm}
 \setlength{\NJUST@backtitleafterskip}{6pt}
 
-\newcommand{\njustbackchapter}[2]{%
+\newcommand{\njustbackchapter}[3][\NJUST@backtitleafterskip]{%
   \clearpage
   \phantomsection
   \thispagestyle{njustmain}%
-  \markboth{#1}{}%
-  \addcontentsline{toc}{chapter}{#1}%
+  \markboth{#2}{}%
+  \addcontentsline{toc}{chapter}{#2}%
   \vspace*{\NJUST@backtitlebeforeskip}
-  \begin{center}{\songti\bfseries\zihao{3}#2}\end{center}
-  \vspace{\NJUST@backtitleafterskip}
+  \begin{center}{\songti\bfseries\zihao{3}#3}\end{center}
+  \vspace{#1}
   \NJUST@bodyfont
   \setlength{\parindent}{2em}%
 }
@@ -801,6 +845,12 @@
   \njustbackchapter{致\quad \quad 谢}{致\quad \quad 谢}%
   \NJUST@firstparindent
 }{\clearpage}
+
+% 附录中的“本科期间发表的论文和出版著作情况：”等小标题。
+% 附录大标题“附  录”到下面正文的距离，只调 \NJUST@appendixtitleafterskip，
+% 不影响致谢、参考文献等其它后置标题。
+\newlength{\NJUST@appendixtitleafterskip}
+\setlength{\NJUST@appendixtitleafterskip}{0pt}
 
 % 附录中的“本科期间发表的论文和出版著作情况：”等小标题。
 % 小标题上下空隙分别调下面两个长度；字号/粗细在 \njustappendixitem 里改。
@@ -817,7 +867,7 @@
 }
 
 \newenvironment{njustappendix}{%
-  \njustbackchapter{附\quad\quad 录}{附\quad\quad 录}%
+  \njustbackchapter[\NJUST@appendixtitleafterskip]{附\quad\quad 录}{附\quad\quad 录}%
 }{\clearpage}
 
 % ----------------------------------------------------------------------
