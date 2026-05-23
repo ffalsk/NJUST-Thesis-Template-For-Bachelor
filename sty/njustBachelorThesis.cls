@@ -29,11 +29,17 @@
 \RequirePackage{graphicx}
 \RequirePackage{tikz}
 \RequirePackage{fancyhdr}
+\RequirePackage{placeins}
 \RequirePackage{caption}
 \RequirePackage{array}
 \RequirePackage{amsmath}
 \RequirePackage{amssymb}
 \RequirePackage{booktabs}
+\RequirePackage{multirow}
+\RequirePackage{algorithm}
+\RequirePackage{algpseudocode}
+\RequirePackage{xcolor}
+\RequirePackage{listings}
 \RequirePackage{etoolbox}
 \RequirePackage[square,comma,numbers,sort&compress,super]{natbib}
 \RequirePackage[hidelinks,hypertexnames=false]{hyperref}
@@ -101,6 +107,11 @@
     BoldFeatures = { FakeBold = \NJUST@CJKBoldFake }
   ]%
 }{}
+\IfFontExistsTF{NSimSun}{%
+  \setCJKmonofont{NSimSun}%
+}{%
+  \IfFontExistsTF{SimSun}{\setCJKmonofont{SimSun}}{}%
+}
 
 % fontset=none 时 ctex 不会自动提供 \songti / \heiti / \kaishu。
 % 这里把模板内部使用的字体命令映射到上面手动定义的 CJK 字体族。
@@ -517,11 +528,29 @@
 \numberwithin{equation}{chapter}
 \numberwithin{figure}{chapter}
 \numberwithin{table}{chapter}
+\numberwithin{algorithm}{chapter}
 \renewcommand{\thefigure}{\thechapter.\arabic{figure}}
 \renewcommand{\thetable}{\thechapter.\arabic{table}}
 \renewcommand{\theequation}{\thechapter.\arabic{equation}}
+\renewcommand{\thealgorithm}{\thechapter.\arabic{algorithm}}
 \renewcommand{\figurename}{图}
 \renewcommand{\tablename}{表}
+\floatname{algorithm}{算法}
+\newcommand\floatc@njustalgorithm[2]{{\NJUST@captionfont\bfseries #1}\ {\NJUST@captionfont #2}\par}
+\newcommand\fs@njustalgorithm{%
+  \let\@fs@capt\floatc@njustalgorithm
+  \def\@fs@pre{\hrule height.8pt depth0pt \kern\NJUST@algorithmtoprulesep}%
+  \def\@fs@post{\kern\NJUST@algorithmbottomrulesep\hrule\relax}%
+  \def\@fs@mid{\kern\NJUST@algorithmcaptionrulesep\hrule\kern\NJUST@algorithmbodyrulesep}%
+  \let\@fs@iftopcapt\iftrue
+}
+\floatstyle{njustalgorithm}
+\restylefloat{algorithm}
+\renewcommand{\ALG@beginalgorithmic}{%
+  \NJUST@bodyfont
+  \setlength{\baselineskip}{\NJUST@algorithmbodybaselineskip}%
+  \setlength{\itemsep}{\NJUST@algorithmitemsep}%
+}
 % 正文引用公式时用 \njusteqref{标签}，输出“式（2.1）”。
 % 如果学校要求改成“公式 (2.1)”这类写法，只改这一行。
 \newcommand{\njusteqref}[1]{式（\ref{#1}）}
@@ -568,6 +597,12 @@
 \newlength{\NJUST@tablecaptionskip}
 \newlength{\NJUST@floattextsep}
 \newlength{\NJUST@floatbelowsqueeze}
+\newlength{\NJUST@algorithmtoprulesep}
+\newlength{\NJUST@algorithmcaptionrulesep}
+\newlength{\NJUST@algorithmbodyrulesep}
+\newlength{\NJUST@algorithmbottomrulesep}
+\newlength{\NJUST@algorithmbodybaselineskip}
+\newlength{\NJUST@algorithmitemsep}
 \newlength{\NJUST@twocolwidth}
 \newlength{\NJUST@threecolwidth}
 \setlength{\NJUST@tablewidth}{0.86\textwidth}
@@ -578,6 +613,18 @@
 \setlength{\NJUST@tablecaptionskip}{1pt}
 \setlength{\NJUST@floattextsep}{10pt}
 \setlength{\NJUST@floatbelowsqueeze}{6pt}
+% 算法环境用 algorithm 包的 ruled 样式，横线和正文间距需要单独调：
+%   \NJUST@algorithmtoprulesep      顶部横线到题注
+%   \NJUST@algorithmcaptionrulesep  题注到底下分隔横线
+%   \NJUST@algorithmbodyrulesep     分隔横线到算法正文
+%   \NJUST@algorithmbottomrulesep   算法正文到底部横线
+%   \NJUST@algorithmbodybaselineskip 算法正文行距
+\setlength{\NJUST@algorithmtoprulesep}{4pt}
+\setlength{\NJUST@algorithmcaptionrulesep}{4pt}
+\setlength{\NJUST@algorithmbodyrulesep}{6pt}
+\setlength{\NJUST@algorithmbottomrulesep}{8pt}
+\setlength{\NJUST@algorithmbodybaselineskip}{20pt}
+\setlength{\NJUST@algorithmitemsep}{0pt}
 \newcommand{\NJUST@tablearraystretch}{1.18}
 \newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
 \newcommand{\NJUST@captionfont}{%
@@ -604,8 +651,72 @@
   aboveskip=\NJUST@tablecaptionaboveskip,
   skip=\NJUST@tablecaptionskip
 }
+\captionsetup[algorithm]{%
+  position=top,
+  aboveskip=\NJUST@tablecaptionaboveskip,
+  skip=\NJUST@tablecaptionskip,
+  justification=raggedright,
+  singlelinecheck=false
+}
 \AtEndEnvironment{figure}{\vspace*{-\NJUST@floatbelowsqueeze}}
 \AtEndEnvironment{table}{\vspace*{-\NJUST@floatbelowsqueeze}}
+\AtEndEnvironment{algorithm}{\vspace*{-\NJUST@floatbelowsqueeze}}
+
+% ----------------------------------------------------------------------
+% Code Listings
+% ----------------------------------------------------------------------
+% 代码块使用 listings，不需要 shell-escape，在线平台更稳。
+% 正文可直接照参考模板写：
+%   \begin{lstlisting}[style=mypython,caption=代码标题,label=code:demo]
+%   ...
+%   \end{lstlisting}
+% 代码字号/行距调 \NJUST@codefont；代码框宽度调 xleftmargin/xrightmargin。
+\newcommand{\NJUST@codefont}{%
+  \ttfamily\zihao{5}\setlength{\baselineskip}{16pt}\selectfont
+}
+\renewcommand{\lstlistingname}{代码}
+\newcommand{\njustcoderef}[1]{代码~\ref{#1}}
+\lstset{
+  basicstyle=\NJUST@codefont,
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  numbersep=0.8em,
+  frame=single,
+  rulecolor=\color{black},
+  backgroundcolor=\color{gray!3},
+  breaklines=true,
+  columns=fullflexible,
+  keepspaces=true,
+  showstringspaces=false,
+  captionpos=b,
+  aboveskip=\NJUST@floattextsep,
+  belowskip=\NJUST@floattextsep,
+  linewidth=\textwidth,
+  xleftmargin=0.05\textwidth,
+  xrightmargin=0.05\textwidth
+}
+\lstdefinestyle{myshell}{
+  language=bash,
+  keywordstyle=\color{blue},
+  commentstyle=\color{green!50!black},
+  stringstyle=\color{red}
+}
+\lstdefinestyle{mylatex}{
+  language=[LaTeX]TeX,
+  keywordstyle=\color{blue}\bfseries,
+  commentstyle=\color{green!60!black},
+  stringstyle=\color{orange},
+  morecomment=[l][\color{green!60!black}]{\%},
+  morekeywords={documentclass,usepackage,begin,end,chapter,section,subsection,caption,label,ref,cite,includegraphics,title,author,date},
+  morekeywords=[2]{article,book,report,beamer,graphicx,amsmath,hyperref,geometry,fancyhdr},
+  keywordstyle=[2]\color{purple}
+}
+\lstdefinestyle{mypython}{
+  language=Python,
+  keywordstyle=\color{blue},
+  commentstyle=\color{green!50!black},
+  stringstyle=\color{red}
+}
 
 % 让正文里的普通 tabular 默认变成定宽表格，效果更接近 Word 示例。
 % 常见的 {cc}/{ccc} 会转成等宽居中列：横线仍较宽，但每列内容在自己的列中居中，

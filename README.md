@@ -226,6 +226,29 @@ Write the English abstract here.
 
 表格总宽度调 `sty/njustBachelorThesis.cls` 中的 `\NJUST@tablewidth`；表格行距调 `\NJUST@tablearraystretch`。
 
+四线表常用于有分组表头的表格。它本质上是在三线表基础上多加一条局部横线 `\cmidrule`，通常配合 `\multirow` 和 `\multicolumn`：
+
+```tex
+\begin{table}[htbp]
+  \centering
+  \caption{不同阳极氧化条件下多孔氧化锡结构参数的四线表示例}
+  \label{tab:four-line}
+  \begin{tabular}{ccccc}
+    \toprule
+    \multirow{2}{*}{电压/V} & \multirow{2}{*}{时间/s} & \multicolumn{2}{c}{形貌参数} & \multirow{2}{*}{$C_{\mathrm{s}}$/(F g$^{-1}$)} \\
+    \cmidrule(lr){3-4}
+     &  & 孔径/nm & 厚度/\textmu m &  \\
+    \midrule
+    3 & 600 & 42.1 & 1.8 & 118.6 \\
+    4 & 600 & 55.8 & 2.3 & 136.7 \\
+    5 & 600 & 67.3 & 2.9 & 129.4 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+```
+
+四条线分别是 `\toprule`、`\cmidrule`、`\midrule`、`\bottomrule`。`\multicolumn{2}{c}{形貌参数}` 表示“形貌参数”跨两列居中；`\multirow{2}{*}{电压/V}` 表示“电压/V”跨两行。复杂表格示例见 `tex/chap2.tex`。
+
 ## 公式
 
 用 `equation` 环境生成带编号公式：
@@ -247,6 +270,84 @@ Write the English abstract here.
 \NJUST@displayaboveskip
 \NJUST@displaybelowskip
 ```
+
+## 算法
+
+伪代码算法使用 `algorithm` 和 `algorithmic` 环境。适合写“步骤、循环、判断、输入输出”，不是用来贴真实源码的。
+
+```tex
+\begin{algorithm}[htbp]
+  \caption{阳极氧化参数筛选流程}
+  \label{alg:anodizing-search}
+  \begin{algorithmic}[1]
+    \Require 电压集合 $V$，氧化时间集合 $T$，目标孔径 $d_0$
+    \Ensure 推荐实验参数 $(v^*, t^*)$
+    \State 初始化最小偏差 $\Delta_{\min} \leftarrow +\infty$
+    \ForAll{$v \in V$}
+      \ForAll{$t \in T$}
+        \State 制备样品并测量平均孔径 $d(v,t)$
+        \If{$|d(v,t)-d_0| < \Delta_{\min}$}
+          \State 更新 $\Delta_{\min} \leftarrow |d(v,t)-d_0|$
+          \State 记录 $(v^*, t^*) \leftarrow (v,t)$
+        \EndIf
+      \EndFor
+    \EndFor
+    \State \Return $(v^*, t^*)$
+  \end{algorithmic}
+\end{algorithm}
+```
+
+常用命令：
+
+- `\Require`：输入条件。
+- `\Ensure`：输出结果。
+- `\State`：普通步骤。
+- `\ForAll ... \EndFor`：循环。
+- `\If ... \EndIf`：条件判断。
+
+算法环境是浮动体，可能会被 LaTeX 移到下一页。如果算法后面紧跟长代码块、图片或表格，顺序被打乱时，在算法后加：
+
+```tex
+\FloatBarrier
+```
+
+它会要求前面的浮动体先排完，再继续排后面的内容。
+
+## 代码块
+
+真实源码用 `lstlisting`。模板使用 `listings` 包，不需要 `shell-escape`，本地和在线平台都比较稳。
+
+```tex
+算法~\ref{alg:anodizing-search} 可以进一步写成程序，示例见\njustcoderef{code:parameter-search}。
+
+\begin{lstlisting}[style=mypython,caption=阳极氧化参数筛选示例,label=code:parameter-search]
+import math
+
+def select_condition(records, target_diameter):
+    best_item = None
+    best_error = math.inf
+    for item in records:
+        error = abs(item["diameter"] - target_diameter)
+        if error < best_error:
+            best_error = error
+            best_item = item
+    return best_item
+\end{lstlisting}
+```
+
+支持的样式：
+
+- `style=mypython`：Python 代码。
+- `style=mylatex`：LaTeX 代码。
+- `style=myshell`：Shell/命令行代码。
+
+代码块引用用：
+
+```tex
+\njustcoderef{code:parameter-search}
+```
+
+注意：`lstlisting` 可以跨页。如果它前面有尚未排出的图、表、算法，可能出现内容顺序看起来被插队的情况。遇到这种情况，在前一个浮动体后加 `\FloatBarrier`。
 
 ## 参考文献
 
@@ -339,6 +440,9 @@ title = {Microstructure of {TiO2} nanotubes}
 - 图表整体与正文的上方基础空白：`\NJUST@floattextsep`
 - 图表下方额外收紧量：`\NJUST@floatbelowsqueeze`
 - 表格宽度和行距：`\NJUST@tablewidth`、`\NJUST@tablearraystretch`
+- 算法横线和正文间距：`\NJUST@algorithmtoprulesep`、`\NJUST@algorithmcaptionrulesep`、`\NJUST@algorithmbodyrulesep`、`\NJUST@algorithmbottomrulesep`
+- 算法正文行距：`\NJUST@algorithmbodybaselineskip`
+- 代码块字号和行距：`\NJUST@codefont`
 - 目录缩进：`\NJUST@toc...` 系列长度
 - 图表目录编号后空白：`\NJUST@lofgap`
 - 致谢/附录标题下空白：`\NJUST@backtitleafterskip`
